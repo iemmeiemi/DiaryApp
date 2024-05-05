@@ -35,8 +35,6 @@ class UserRepository(
             Result.Error(e)
         }
 
-    // Phương thức mở rộng chuyển đổi từ com.example.diaryapp.data.Result sang kotlin.Result
-
     private suspend fun saveUserToFirestore(user: User) {
         firestore.collection("users").document("email").set(user).await()
     }

@@ -30,7 +30,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.diaryapp.R
+import com.example.diaryapp.screen.navigation.Screen
 import com.google.firebase.annotations.concurrent.Background
 
 sealed class WidgetTag(
@@ -48,15 +52,18 @@ fun SmallItemWidget(
     tag: String,
     title: String,
     previewContent: String,
-    diaryId: String,
-    onNavigateToSpecificDiary: (diaryId: String) -> Unit
+    Id: String,
+    navController: NavHostController,
 ) {
+    val route = if (tag == "diary") {Screen.DiarySheetScreen.route}
+    else if (tag == "letter") { Screen.DiarySheetScreen.route }
+    else { }
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(30.dp, 0.dp, 30.dp, 10.dp)
             .clickable {
-                onNavigateToSpecificDiary(diaryId)
+                navController.navigate("${Screen.DiarySheetScreen.route}/${Id}")
             }
     ) {
         Row (
@@ -78,10 +85,11 @@ fun SmallItemWidget(
             Icon(
                 imageVector = icon,
                 contentDescription = "Diary",
-                modifier = Modifier.background(
-                    color = Color.Gray,
-                    shape = RoundedCornerShape(20.dp)
-                )
+                modifier = Modifier
+                    .background(
+                        color = Color.Gray,
+                        shape = RoundedCornerShape(20.dp)
+                    )
                     .padding(5.dp)
             )
 
@@ -106,7 +114,6 @@ fun SmallItemWidget(
 @Preview
 @Composable
 fun preview() {
-    SmallItemWidget(tag = "diary", title = "Nice day", previewContent = "sdadsdfsfsdfsdfsdfsdfsdfsfsdfsdfsadadad12sdfsdfsdfsdfsdfsfsdfsdfsadadad1", "áddad") {
-
-    }
+    val navController = rememberNavController()
+    SmallItemWidget(tag = "diary", title = "Nice day", previewContent = "sdadsdfsfsdfsdfsdfsdfsdfsfsdfsdfsadadad12sdfsdfsdfsdfsdfsfsdfsdfsadadad1", "sffsdf", navController)
 }

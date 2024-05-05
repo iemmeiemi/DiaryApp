@@ -1,5 +1,7 @@
 package com.example.diaryapp.screen.screens
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,19 +23,29 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.diaryapp.data.Diary
+import com.example.diaryapp.screen.components.CustomButton
+import com.example.diaryapp.screen.navigation.Screen
+import com.example.diaryapp.viewmodel.DiaryViewModel
 
 @Composable
 fun DiarySheetScreen(
-    diary: Diary?,
-    onNavigateToDiaryForUpdate: (diary: Diary) -> Unit
+    diaryId: String?,
+    diaryViewModel: DiaryViewModel,
+    navController: NavHostController,
+    context: Context
 ) {
+    val diaries by diaryViewModel.diaries.observeAsState(emptyList())
+    val diary: Diary? = diaries?.find { d -> d.id == diaryId }
     Box (
         modifier = Modifier
             .fillMaxWidth()
@@ -67,26 +79,26 @@ fun DiarySheetScreen(
                         .padding(10.dp)
                         .fillMaxWidth()
                         .height(200.dp)
-//                        .scrollable(
-//                            state = rememberScrollableState { delta ->
-//                                offset = offset + delta
-//                                delta
-//                            },
-//                            orientation = Orientation.Vertical,
-//                        )
                         .verticalScroll(rememberScrollState())
                 ) {
                     Text(text = diary?.content ?: "Nothing Here...")
                 }
             }
 
-            Row {
+            Row (
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
                 Button(
                     onClick = {
                         if (diary != null) {
-                            onNavigateToDiaryForUpdate( diary)
+                            navController.navigate("${Screen.DiaryScreen.route}?diaryId=${diary.id}")
                         } else {
-
+                            Toast.makeText(
+                                context,
+                                "Error!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 ) {

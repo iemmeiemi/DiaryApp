@@ -28,18 +28,18 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.diaryapp.data.Result
 import com.example.diaryapp.screen.navigation.Router
+import com.example.diaryapp.screen.navigation.Screen
 import com.example.diaryapp.viewmodel.AuthViewModel
 
 
 @Composable
 fun SignUpScreen(
     authViewModel: AuthViewModel,
-    onNavigateToLogin: () -> Unit,
+    navController: NavHostController,
     context: Context,
-    onSignUpSuccess:() -> Unit,
-
 ) {
     val result by authViewModel.authResult.observeAsState()
     var email by remember { mutableStateOf("") }
@@ -108,7 +108,9 @@ fun SignUpScreen(
                             "Sign Up Successfully!",
                             Toast.LENGTH_SHORT
                         ).show()
-                        onSignUpSuccess()
+                        navController.navigate(Screen.LoginScreen.route) {
+                            launchSingleTop = true
+                        }
                     }
                     is Result.Error -> {
                         // Xử lý lỗi đăng ky
@@ -136,7 +138,11 @@ fun SignUpScreen(
         }
         Spacer(modifier = Modifier.height(16.dp))
         Text("Already have an account? Sign in.",
-            modifier = Modifier.clickable { onNavigateToLogin() }
+            modifier = Modifier.clickable {
+                navController.navigate(Screen.LoginScreen.route) {
+                    launchSingleTop = true
+                }
+            }
         )
     }
 }
@@ -146,9 +152,8 @@ fun SignUpScreen(
 @Composable
 fun LoginScreen(
     authViewModel: AuthViewModel,
-    onNavigateToSignUp: () -> Unit,
+    navController: NavHostController,
     context: Context,
-    onSignInSuccess:() -> Unit,
 ) {
     val result by authViewModel.authResult.observeAsState()
     var email by remember { mutableStateOf("") }
@@ -196,14 +201,24 @@ fun LoginScreen(
                     is Result.Success -> {
                         Toast.makeText(
                             context,
-                            "Sign Up Successfully!",
+                            "Sign In Successfully!",
                             Toast.LENGTH_SHORT
                         ).show()
 
-                        onSignInSuccess()
+                        navController.navigate(Screen.HomeScreen.route) {
+                            popUpTo(Screen.LoginScreen.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
                     }
                     is Result.Error -> {
-                        // Xử lý lỗi đăng nhập
+                        Toast.makeText(
+                            context,
+                            (result as Result.Error).exception.message.toString(),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        Log.e ("error", (result as Result.Error).exception.message.toString())
                     }
                     else -> {
 
@@ -218,7 +233,11 @@ fun LoginScreen(
         }
         Spacer(modifier = Modifier.height(16.dp))
         Text("Don't have an account? Sign up.",
-            modifier = Modifier.clickable { onNavigateToSignUp() }
+            modifier = Modifier.clickable {
+                navController.navigate(Screen.SignupScreen.route) {
+                    launchSingleTop = true
+                }
+            }
         )
     }
 }

@@ -28,25 +28,29 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.diaryapp.data.Diary
 import com.example.diaryapp.data.Result
+import com.example.diaryapp.screen.navigation.Screen
 import com.example.diaryapp.viewmodel.DiaryViewModel
 
 @Composable
 fun DiaryScreen(
     diaryViewModel: DiaryViewModel,
+    navController: NavHostController,
     context: Context,
     paddingValues: PaddingValues,
-
     diaryId : String = "",
-    diaryTitle: String = "",
-    diaryContent: String = "",
-
-    onNavigateToHome: () -> Unit
-    ) {
-    val result by diaryViewModel.diaryResult.observeAsState()
+) {
+    val result by diaryViewModel.createDiaryResult.observeAsState()
+    val diaries by diaryViewModel.diaries.observeAsState()
     var diaryTitle by remember { mutableStateOf("") }
     var diaryContent by remember { mutableStateOf("") }
+    var diary: Diary? by remember { mutableStateOf(null) }
+    val isNotNull = diaryId.isNotBlank()
+    if (isNotNull) {
+        diary = diaries?.find { diary: Diary -> diary.id == diaryId }
+    }
 
     Column (modifier = Modifier.padding(paddingValues)) {
         Row {
@@ -97,7 +101,7 @@ fun DiaryScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
         OutlinedTextField(
-            value = diaryContent,
+            value = if (isNotNull) { diary?.content ?: "" } else diaryContent,
             onValueChange = { diaryContent = it },
             label = { Text(text = "How you doing?")},
             modifier = Modifier
@@ -108,21 +112,32 @@ fun DiaryScreen(
 
         Button(
             onClick = {
-                val diary = Diary(title = diaryTitle, content = diaryContent)
-                diaryViewModel.createDiary( diary )
+                val diary = Diary(id = diaryId ?: "", title = diaryTitle, content = diaryContent)
+
+                if (isNotNull) {
+                    diaryViewModel.updateDiary( diary )
+                } else {
+                    diaryViewModel.createDiary( diary )
+                }
+
                 when(result) {
                     is Result.Success -> {
                         Toast.makeText(
                             context,
-                            "Diary successfully added!",
+                            "Successfully",
                             Toast.LENGTH_SHORT
                         ).show()
-                        onNavigateToHome()
+                        navController.navigate(Screen.HomeScreen.route) {
+                            popUpTo(Screen.DiaryScreen.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
                     }
                     is Result.Error -> {
                         Toast.makeText(
                             context,
-                            "Diary Unsuccessfully added!",
+                            (result as Result.Error).exception.message.toString(),
                             Toast.LENGTH_SHORT
                         ).show()
                     }

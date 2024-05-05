@@ -15,6 +15,7 @@ class AuthViewModel : ViewModel() {
     private val _authResult = MutableLiveData<Result<Boolean>>()
     val authResult: LiveData<Result<Boolean>> get() = _authResult
 
+
     init {
         userRepository = UserRepository(
             FirebaseAuth.getInstance(),

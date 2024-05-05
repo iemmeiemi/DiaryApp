@@ -14,89 +14,77 @@ import java.util.concurrent.CompletableFuture
 class DiaryRepository(
     private val firestore: FirebaseFirestore
 ): DiaryRepoInterface {
-    private suspend fun saveDiaryToFirestore(userEmail:String, diary: Diary) {
-        firestore.collection("users").document(userEmail.toString())
-            .collection("diaries").document().set(diary).await()
+
+    var diaryCollection = firestore.collection("users").document("email")
+        .collection("diaries")
+
+    private suspend fun saveDiaryToFirestore(userEmail: String, diary: Diary) {
+        diaryCollection.document().set(diary).await()
     }
 
-    override suspend fun createDiary( userEmail: String, diary: Diary): Result<Boolean>? =
+    override suspend fun createDiary(userEmail: String, diary: Diary): Result<Boolean>? =
         try {
-            val document = firestore.collection("users").document()
-                .collection("diary").document()
+            val document = firestore.collection("users").document(userEmail)
+                .collection("diaries").document()
             diary.id = document.id
             saveDiaryToFirestore(userEmail, diary)
-            Result.Success(true )
-        } catch(e: Exception) {
+            Result.Success(true)
+        } catch (e: Exception) {
             Result.Error(e)
         }
 
-    override suspend fun updateDiary(diaryId: String, diary: Diary) : Result<Boolean>? =
+    override suspend fun updateDiary(diaryId: String, diary: Diary): Result<Boolean>? =
         try {
-            firestore.collection("users").document("email")
-                .collection("diaries").document(diaryId).set(diary).await()
-            Result.Success(true )
-        } catch(e: Exception) {
+            diaryCollection.document(diaryId).set(diary)
+                .addOnSuccessListener {}
+                .addOnFailureListener { e ->
+                    throw Exception(e)
+                }
+            Result.Success(true)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+
+    override suspend fun softDeleteDiary(diaryId: String, diary: Diary): Result<Boolean>? =
+        try {
+
+            diaryCollection.document(diaryId).set(diary)
+                .addOnSuccessListener { }
+                .addOnFailureListener { e -> throw Exception(e) }
+            Result.Success(true)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+
+    override suspend fun deleteDiary(diaryId: String): Result<Boolean>? =
+        try {
+            diaryCollection.document(diaryId).delete()
+                .addOnSuccessListener { }
+                .addOnFailureListener { e -> throw Exception(e) }
+            Result.Success(true)
+        } catch (e: Exception) {
             Result.Error(e)
         }
 
 
-    suspend fun deleteDiary() {
 
-    }
-
-    override suspend fun getDiaries(userEmail: String ) : List<Diary> {
-        Log.i("reporun", "intothe repo")
-
-        val varDiaries = firestore.collection("users").document(userEmail)
-            .collection("diaries")
-        return try {
-            val documents = varDiaries.get().await()
-            val diaries = mutableListOf<Diary>()
-            if(documents.isEmpty) {
-                emptyList()
-            } else {
-                Log.e(" repo", "doc")
-                for (document in documents) {
-                    val diary = document.toObject(Diary::class.java)
-                    diaries.add(diary)
-                }
-                diaries
+    override suspend fun getAllDiary(userEmail: String): Result<List<Diary>> =
+        try {
+            val querySnapshot = firestore.collection("users").document(userEmail)
+                .collection("diaries").get().await()
+            val diaries = querySnapshot.documents.map { document ->
+                document.toObject(Diary::class.java)!!.copy(id = document.id)
             }
-        } catch (exception: Exception) {
-            // Xử lý bất kỳ ngoại lệ nào xảy ra trong quá trình lấy dữ liệu
-            Log.e("error repo", "Lỗi khi lấy danh sách nhật ký: ${exception.message}")
-            emptyList()
+            Log.i("chekc", "getAllDiary: " + diaries.isEmpty())
+            Result.Success(diaries)
+        } catch (e: Exception) {
+            Result.Error(e)
         }
-    }
-
-
-    override suspend fun getAllDiary(userEmail: String): Result<Boolean>? {
-        TODO("Not yet implemented")
-    }
-
-
-//    suspend fun getAllDiary(userEmail: String) : Result<Boolean>? =
-//        try {
-//            val querySnapshot = firestore.collection("users").document(userEmail)
-//                .collection("diaries").get().await()
-//            for (document in querySnapshot.documents) {
-//                val diary = document.toObject<Diary>()
-//                diary?.let {
-//                    diaries.add(it)
-//                }
-//            }
-//            Result.Success( true )
-//        } catch(e: Exception) {
-//            Result.Error(e)
-//        }
 
     override suspend fun getOneDiary() {
 
     }
 
-    suspend fun getDiaryofMonth() {
-
-    }
 }
 
 
