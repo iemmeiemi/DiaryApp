@@ -1,5 +1,6 @@
 package com.example.diaryapp.data.repositories
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.example.diaryapp.data.Result
@@ -29,7 +30,9 @@ class UserRepository(
 
     override suspend fun login(email: String, password: String): Result<Boolean> =
         try {
+            Log.e("login", "yes")
             auth.signInWithEmailAndPassword(email, password).await()
+            Log.e("login", "oryes")
             Result.Success(true)
         } catch (e: Exception) {
             Result.Error(e)

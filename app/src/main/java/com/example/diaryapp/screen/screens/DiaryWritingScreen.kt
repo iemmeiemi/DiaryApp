@@ -42,15 +42,22 @@ fun DiaryScreen(
     paddingValues: PaddingValues,
     diaryId : String = "",
 ) {
-    val result by diaryViewModel.createDiaryResult.observeAsState()
+    val result by diaryViewModel.CRUDDiaryResult.observeAsState()
     val diaries by diaryViewModel.diaries.observeAsState()
-    var diaryTitle by remember { mutableStateOf("") }
-    var diaryContent by remember { mutableStateOf("") }
-    var diary: Diary? by remember { mutableStateOf(null) }
-    val isNotNull = diaryId.isNotBlank()
+    var dt = ""
+    var dc = ""
+    val isNotNull = !diaryId.isNullOrBlank()
     if (isNotNull) {
-        diary = diaries?.find { diary: Diary -> diary.id == diaryId }
+        val diary = diaries?.find { d -> d.id == diaryId }
+        if (diary != null) {
+            dt = diary.title
+            dc = diary.content
+        }
     }
+    var diaryTitle by remember { mutableStateOf(dt) }
+    var diaryContent by remember { mutableStateOf(dc) }
+
+
 
     Column (modifier = Modifier.padding(paddingValues)) {
         Row {
@@ -101,7 +108,7 @@ fun DiaryScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
         OutlinedTextField(
-            value = if (isNotNull) { diary?.content ?: "" } else diaryContent,
+            value = diaryContent,
             onValueChange = { diaryContent = it },
             label = { Text(text = "How you doing?")},
             modifier = Modifier
@@ -112,21 +119,16 @@ fun DiaryScreen(
 
         Button(
             onClick = {
-                val diary = Diary(id = diaryId ?: "", title = diaryTitle, content = diaryContent)
-
+                val d = Diary(id = diaryId ,title = diaryTitle, content = diaryContent)
                 if (isNotNull) {
-                    diaryViewModel.updateDiary( diary )
+                    diaryViewModel.updateDiary( d )
                 } else {
-                    diaryViewModel.createDiary( diary )
+                    diaryViewModel.createDiary( d )
                 }
 
                 when(result) {
                     is Result.Success -> {
-                        Toast.makeText(
-                            context,
-                            "Successfully",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        ToastMaker(context = context, "Successfully!")
                         navController.navigate(Screen.HomeScreen.route) {
                             popUpTo(Screen.DiaryScreen.route) {
                                 inclusive = true
@@ -135,11 +137,7 @@ fun DiaryScreen(
                         }
                     }
                     is Result.Error -> {
-                        Toast.makeText(
-                            context,
-                            (result as Result.Error).exception.message.toString(),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        ToastMaker(context = context, (result as Result.Error).exception.message.toString())
                     }
                     else -> {
 
@@ -152,5 +150,13 @@ fun DiaryScreen(
             Text(text = "Done")
         }
     }
+}
+
+fun ToastMaker(context: Context, text: String) {
+    Toast.makeText(
+        context,
+        text,
+        Toast.LENGTH_SHORT
+    ).show()
 }
 

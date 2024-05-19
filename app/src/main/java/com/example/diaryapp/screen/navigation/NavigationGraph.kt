@@ -12,9 +12,12 @@ import com.example.diaryapp.screen.screens.DiaryScreen
 import com.example.diaryapp.screen.screens.DiarySheetScreen
 import com.example.diaryapp.screen.screens.HomeScreen
 import com.example.diaryapp.screen.screens.LoginScreen
+import com.example.diaryapp.screen.screens.NotificationScreen
+import com.example.diaryapp.screen.screens.ProfileScreen
 import com.example.diaryapp.screen.screens.SignUpScreen
 import com.example.diaryapp.viewmodel.AuthViewModel
 import com.example.diaryapp.viewmodel.DiaryViewModel
+import com.example.diaryapp.data.Result
 import com.example.diaryapp.viewmodel.HomeViewModel
 
 
@@ -28,9 +31,30 @@ fun NavigationGraph(
     diaryViewModel: DiaryViewModel = viewModel(),
 
 ) {
+    authViewModel.autoLogin()
+    var startDestination: String = Screen.LoginScreen.route
+    authViewModel.authResult.value?.let { result ->
+        when (result) {
+            is Result.Success<Boolean> -> {
+                if (result.data == true) {
+                    // Do something when authResult is true
+                    startDestination = Screen.HomeScreen.route
+                } else {
+                    // Do something when authResult is false
+                }
+            }
+            is Result.Error -> {
+                // Handle the error case
+            }
+            else -> {}
+        }
+    }
+    Log.e("log", startDestination)
+
     NavHost(
         navController = navController,
-        startDestination = Screen.LoginScreen.route
+        startDestination = startDestination
+
     ) {
         composable(Screen.SignupScreen.route) {
             Log.i("run", "signup")
@@ -51,20 +75,28 @@ fun NavigationGraph(
         composable(Screen.HomeScreen.route) {
             Log.i("run", "home")
             HomeScreen(
-//                diaryViewModel = diaryViewModel,
-//                navController = navController,
+                diaryViewModel = diaryViewModel,
+                navController = navController,
+                paddingValues = paddingValues
             )
         }
         composable(Screen.DiaryScreen.route) {
             DiaryScreen( diaryViewModel, navController, context, paddingValues )
         }
 
+        composable(Screen.ProfileScreen.route) {
+            ProfileScreen(navController, paddingValues, authViewModel)
+        }
 
-        composable("${Screen.DiaryScreen.route}/diaryId={diaryId}") {
-            val id = it.arguments?.getString("diaryId")
+        composable(Screen.NotificationScreen.route) {
+            NotificationScreen( paddingValues = paddingValues, navController = navController )
+        }
+
+        composable("${Screen.DiaryScreen.route}/{diaryId}") {
+            val diaryId = it.arguments?.getString("diaryId")
             DiaryScreen(
                 diaryViewModel, navController, context, paddingValues,
-                diaryId = id.toString(),
+                diaryId = diaryId.toString(),
             )
         }
 
@@ -75,6 +107,7 @@ fun NavigationGraph(
                 diaryViewModel = diaryViewModel,
                 navController,
                 context,
+                paddingValues
             )
         }
     }

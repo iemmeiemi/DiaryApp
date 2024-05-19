@@ -11,37 +11,48 @@ import com.example.diaryapp.data.repositories.DiaryRepository
 import com.example.diaryapp.di.FireBaseInjection
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
 
 class DiaryViewModel: ViewModel() {
 
-    val firebaseAuth = FirebaseAuth.getInstance()
-    val currentUser = firebaseAuth.currentUser
-    val userEmail = currentUser?.email
+    private val firebaseAuth = FirebaseAuth.getInstance()
+    private val currentUser = firebaseAuth.currentUser
+    private val userEmail = currentUser?.email
 
     private val diaryRepository: DiaryRepository
 
-    private val _createDiaryResult = MutableLiveData<Result<Boolean>>()
-    val createDiaryResult: LiveData<Result<Boolean>> get() = _createDiaryResult
-
-    private val _updateDiaryResult = MutableLiveData<Result<Boolean>>()
-    val updateDiaryResult: LiveData<Result<Boolean>> get() = _updateDiaryResult
+    //thay đổi thành StateFlow, LiveData lỗi thời r
+    private val _CRUDDiaryResult = MutableLiveData<Result<Boolean>>()
+    val CRUDDiaryResult: LiveData<Result<Boolean>> get() = _CRUDDiaryResult
 
     private val _diaries = MutableLiveData<List<Diary>>()
     val diaries: LiveData<List<Diary>> get() = _diaries
 
+    private val _diaryInOneDay = MutableLiveData<Diary>()
+    val diaryInOneDay: LiveData<Diary> get() = _diaryInOneDay
+
+    private val _displayDiaries = MutableLiveData<List<Diary>>()
+    val displayDiaries: LiveData<List<Diary>> get() = _displayDiaries
 
     init {
         diaryRepository = DiaryRepository(
             FireBaseInjection.instance()
         )
-        getDiaries()
+//        getDiaries()
     }
+
+    fun display(type: String) {
+        if (type == "one") {
+            _displayDiaries.value = diaryInOneDay.value?.let { listOf(it) }
+        } else if (type == "all") {
+            _displayDiaries.value = diaries.value
+        }
+    }
+
 
     fun createDiary(diary: Diary) {
         viewModelScope.launch {
-            _createDiaryResult.value = diaryRepository.createDiary(userEmail.toString(), diary)
+            _CRUDDiaryResult.value = diaryRepository.createDiary(userEmail.toString(), diary)
         }
     }
 
@@ -50,25 +61,40 @@ class DiaryViewModel: ViewModel() {
             when (val result = diaryRepository.getAllDiary(userEmail.toString())) {
                 is Result.Success -> _diaries.value = result.data as List<Diary>
                 is Error -> {
-
+                    //Log.e("eror", )
                 }
-
                 else -> {}
             }
-//            val list : List<Diary> = diaryRepository.getDiaries(userEmail.toString())
-//            _diaries.value = list
         }
     }
+
+    /*fun getDiariesInOneDay(date: String) {
+        viewModelScope.launch {
+            Log.e("func2" , diaries.value.toString())
+            _diaryInOneDay.value = diaries.value?.find { d -> d.getDate() == date }
+            _diaryInOneDay.value?.getDate()?.let { Log.e("func", it) }
+            Log.e("func2" , date)
+        }
+    }*/
 
     fun updateDiary(diary: Diary) {
         viewModelScope.launch {
-            if (diary.id.isBlank()) {
-                _updateDiaryResult.value = Result.Error(Exception("There's a lack in software!"))
+            if (diary.id.isNullOrEmpty() || userEmail.isNullOrEmpty() ) {
+                _CRUDDiaryResult.value = Result.Error(Exception("There's a lack in software!"))
             } else {
-                _updateDiaryResult.value = diaryRepository.updateDiary(diaryId = diary.id, diary)
+                _CRUDDiaryResult.value =
+                    diaryRepository.updateDiary( userEmail.toString(), diaryId = diary.id, diary)
             }
         }
     }
 
-
+    fun softDeleteDiary(diary: Diary) {
+        viewModelScope.launch {
+            if (diary.id.isNullOrEmpty() || userEmail.isNullOrEmpty() ) {
+                _CRUDDiaryResult.value = Result.Error(Exception("There's a lack in software!"))
+            } else {
+                _CRUDDiaryResult.value = diaryRepository.softDeleteDiary( userEmail, diary )
+            }
+        }
+    }
 }

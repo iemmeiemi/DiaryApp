@@ -19,23 +19,21 @@ class DiaryRepository(
         .collection("diaries")
 
     private suspend fun saveDiaryToFirestore(userEmail: String, diary: Diary) {
-        diaryCollection.document().set(diary).await()
+        firestore.collection("users").document(userEmail).collection("diaries").document().set(diary).await()
     }
 
     override suspend fun createDiary(userEmail: String, diary: Diary): Result<Boolean>? =
         try {
-            val document = firestore.collection("users").document(userEmail)
-                .collection("diaries").document()
-            diary.id = document.id
             saveDiaryToFirestore(userEmail, diary)
+            Log.e("here", "saving")
             Result.Success(true)
         } catch (e: Exception) {
             Result.Error(e)
         }
 
-    override suspend fun updateDiary(diaryId: String, diary: Diary): Result<Boolean>? =
+    override suspend fun updateDiary(userEmail: String, diaryId: String, diary: Diary): Result<Boolean>? =
         try {
-            diaryCollection.document(diaryId).set(diary)
+            firestore.collection("users").document(userEmail).collection("diaries").document(diaryId).set(diary)
                 .addOnSuccessListener {}
                 .addOnFailureListener { e ->
                     throw Exception(e)
@@ -45,10 +43,10 @@ class DiaryRepository(
             Result.Error(e)
         }
 
-    override suspend fun softDeleteDiary(diaryId: String, diary: Diary): Result<Boolean>? =
+    override suspend fun softDeleteDiary(userEmail: String, diary: Diary): Result<Boolean>? =
         try {
-
-            diaryCollection.document(diaryId).set(diary)
+            diary.delete = true
+            firestore.collection("users").document(userEmail).collection("diaries").document(diary.id).set(diary)
                 .addOnSuccessListener { }
                 .addOnFailureListener { e -> throw Exception(e) }
             Result.Success(true)
@@ -56,9 +54,10 @@ class DiaryRepository(
             Result.Error(e)
         }
 
-    override suspend fun deleteDiary(diaryId: String): Result<Boolean>? =
+    override suspend fun deleteDiary(diary: Diary): Result<Boolean>? =
         try {
-            diaryCollection.document(diaryId).delete()
+            diary.delete=true
+            diaryCollection.document(diary.id).delete()
                 .addOnSuccessListener { }
                 .addOnFailureListener { e -> throw Exception(e) }
             Result.Success(true)
@@ -70,8 +69,9 @@ class DiaryRepository(
 
     override suspend fun getAllDiary(userEmail: String): Result<List<Diary>> =
         try {
+            Log.i("chekc", "getAllDiary: " +userEmail)
             val querySnapshot = firestore.collection("users").document(userEmail)
-                .collection("diaries").get().await()
+                .collection("diaries").whereEqualTo("delete", false).get().await()
             val diaries = querySnapshot.documents.map { document ->
                 document.toObject(Diary::class.java)!!.copy(id = document.id)
             }
@@ -84,6 +84,22 @@ class DiaryRepository(
     override suspend fun getOneDiary() {
 
     }
+
+    //may not use
+    override suspend fun getDiariesInOneDay(date: String, userEmail: String) : Result<List<Diary>> =
+        try {
+            val querySnapshot = firestore.collection("users").document(userEmail)
+                .collection("diaries")
+                .whereEqualTo("createdAt", date)
+                .get().await()
+            val diaries = querySnapshot.documents.map { document ->
+                document.toObject(Diary::class.java)!!.copy(id = document.id)
+            }
+            Log.i("chekc", "getONeDiaryInonedate: " + diaries.isEmpty())
+            Result.Success(diaries)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
 
 }
 

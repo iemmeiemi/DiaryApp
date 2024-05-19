@@ -196,6 +196,7 @@ fun LoginScreen(
         Button(
             onClick = {
 
+                Log.e("login", email)
                 authViewModel.login(email, password)
                 when (result) {
                     is Result.Success -> {
@@ -204,6 +205,7 @@ fun LoginScreen(
                             "Sign In Successfully!",
                             Toast.LENGTH_SHORT
                         ).show()
+                        Log.e("login", "no")
 
                         navController.navigate(Screen.HomeScreen.route) {
                             popUpTo(Screen.LoginScreen.route) {
@@ -215,7 +217,7 @@ fun LoginScreen(
                     is Result.Error -> {
                         Toast.makeText(
                             context,
-                            (result as Result.Error).exception.message.toString(),
+                             "Error in Login", //(result as Result.Error).exception.message.toString() ||
                             Toast.LENGTH_SHORT
                         ).show()
                         Log.e ("error", (result as Result.Error).exception.message.toString())

@@ -8,9 +8,10 @@ import java.util.concurrent.CompletableFuture
 interface DiaryRepoInterface {
 
     suspend fun createDiary( userEmail: String, diary: Diary): Result<Boolean>?
-    suspend fun updateDiary(diaryId: String, diary: Diary) : Result<Boolean>?
-    suspend fun softDeleteDiary(diaryId: String, diary: Diary): Result<Boolean>?
-    suspend fun deleteDiary(diaryId: String): Result<Boolean>?
+    suspend fun updateDiary(userEmail: String, diaryId: String, diary: Diary): Result<Boolean>?
+    suspend fun softDeleteDiary( userEmail: String, diary: Diary ): Result<Boolean>?
+    suspend fun deleteDiary( diary: Diary ): Result<Boolean>?
     suspend fun getAllDiary(userEmail: String): Result<List<Diary>>
     suspend fun getOneDiary()
+    suspend fun getDiariesInOneDay(date: String, userEmail: String): Result<List<Diary>>
 }
