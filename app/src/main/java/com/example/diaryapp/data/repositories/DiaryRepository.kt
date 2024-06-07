@@ -5,10 +5,8 @@ import com.example.diaryapp.data.Diary
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import com.example.diaryapp.data.Result
-import com.google.firebase.firestore.Filter
-import com.google.firebase.firestore.toObject
-import java.util.Locale
-import java.util.concurrent.CompletableFuture
+import com.example.diaryapp.network.firebaseStorage
+import com.google.firebase.firestore.Query
 
 
 class DiaryRepository(
@@ -24,6 +22,11 @@ class DiaryRepository(
 
     override suspend fun createDiary(userEmail: String, diary: Diary): Result<Boolean>? =
         try {
+            if (diary.images.isNotEmpty()) {
+                Log.e("hahahahahah", diary.images.isNotEmpty().toString())
+                diary.images = firebaseStorage().saveAndGetLink(diary.images, userEmail)
+                Log.e("hahahahahah", diary.images.isNotEmpty().toString())
+            }
             saveDiaryToFirestore(userEmail, diary)
             Log.e("here", "saving")
             Result.Success(true)
@@ -71,7 +74,10 @@ class DiaryRepository(
         try {
             Log.i("chekc", "getAllDiary: " +userEmail)
             val querySnapshot = firestore.collection("users").document(userEmail)
-                .collection("diaries").whereEqualTo("delete", false).get().await()
+                .collection("diaries")
+                .whereEqualTo("delete", false)
+                .orderBy("createdAt", Query.Direction.ASCENDING)
+                .get().await()
             val diaries = querySnapshot.documents.map { document ->
                 document.toObject(Diary::class.java)!!.copy(id = document.id)
             }

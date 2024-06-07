@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.example.diaryapp.data.Result
 import com.example.diaryapp.data.User
+import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.tasks.await
 
 class UserRepository(
@@ -41,4 +42,22 @@ class UserRepository(
     private suspend fun saveUserToFirestore(user: User) {
         firestore.collection("users").document("email").set(user).await()
     }
+
+    suspend fun getUser(userEmail: String): Result<User?>  =
+        try {
+            var user: User? = null
+            Log.e("users", "begin")
+             firestore.collection("users").document(userEmail).get()
+                .addOnSuccessListener {
+                    Log.e("users", "succ")
+                    user = it.toObject<User>()
+                }
+                 .addOnFailureListener{
+                     Log.e("users", "fail")
+                     throw Exception("No user info")
+                 }
+            Result.Success( user )
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
 }

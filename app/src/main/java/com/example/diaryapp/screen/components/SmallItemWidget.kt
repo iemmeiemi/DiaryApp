@@ -1,22 +1,22 @@
 package com.example.diaryapp.screen.components
 
-import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.sharp.MailOutline
 import androidx.compose.material3.Icon
@@ -26,16 +26,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.example.diaryapp.R
+import coil.compose.AsyncImage
+import com.example.diaryapp.data.Mood
 import com.example.diaryapp.screen.navigation.Screen
-import com.google.firebase.annotations.concurrent.Background
+import com.google.firebase.Timestamp
+
 
 sealed class WidgetTag(
     val tag: String,
@@ -52,6 +53,7 @@ fun SmallItemWidget(
     tag: String,
     title: String,
     previewContent: String,
+    timestamp: Timestamp?,
     Id: String,
     navController: NavHostController,
 ) {
@@ -105,15 +107,75 @@ fun SmallItemWidget(
                     text = previewContent,
                     maxLines = 1
                 )
+                Text(
+                    text = timestamp?.toDate().toString(),
+                    fontSize = 10.sp,
+                    maxLines = 1
+                )
             }
         }
     }
 
 }
 
+@Composable
+fun MoodItem(mood: Mood) {
+    Box(
+        modifier = Modifier.clickable {
+
+        }
+    ) {
+        AsyncImage(
+            model = mood.icon,
+            contentDescription = mood.description
+        )
+    }
+}
+
+@Composable
+fun ImageModifiableBox(
+    uri: Uri,
+    content: String?,
+    onDelete:() -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .clickable { }
+            .fillMaxSize()
+    ) {
+        AsyncImage(
+            model = uri,
+            contentDescription = content,
+            Modifier
+                .fillMaxSize(),
+            contentScale  = ContentScale.Fit
+        )
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .clickable {
+                    onDelete()
+                }
+                .padding(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Close,
+                contentDescription = "Delete",
+                tint = Color.White,
+                modifier = Modifier
+                    .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
+                    .padding(8.dp)
+                    .size(20.dp)
+            )
+        }
+    }
+}
+
 @Preview
 @Composable
 fun preview() {
-    val navController = rememberNavController()
-    SmallItemWidget(tag = "diary", title = "Nice day", previewContent = "sdadsdfsfsdfsdfsdfsdfsdfsfsdfsdfsadadad12sdfsdfsdfsdfsdfsfsdfsdfsadadad1", "sffsdf", navController)
+//    val navController = rememberNavController()
+//    SmallItemWidget(tag = "diary", title = "Nice day", previewContent = "sdadsdfsfsdfsdfsdfsdfsdfsfsdfsdfsadadad12sdfsdfsdfsdfsdfsfsdfsdfsadadad1", "sffsdf", navController)
+    //ImageModifiableBox()
 }

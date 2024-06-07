@@ -2,7 +2,6 @@ package com.example.diaryapp.screen.screens
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,23 +15,32 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.diaryapp.data.Diary
 import com.example.diaryapp.screen.components.CalendarComponent
 import com.example.diaryapp.screen.components.CenterTextField
 import com.example.diaryapp.screen.components.CustomButton2
@@ -40,6 +48,9 @@ import com.example.diaryapp.screen.components.SmallItemWidget
 import com.example.diaryapp.screen.navigation.Screen
 import com.example.diaryapp.theme.Background
 import com.example.diaryapp.theme.Background2
+import com.example.diaryapp.theme.Black
+import com.example.diaryapp.utils.getDate
+import com.example.diaryapp.viewmodel.AuthViewModel
 import com.example.diaryapp.viewmodel.DiaryViewModel
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
@@ -48,13 +59,16 @@ import java.time.LocalDate
 @Composable
 fun HomeScreen(
     diaryViewModel: DiaryViewModel,
+    authViewModel: AuthViewModel,
     navController: NavHostController,
     context: Context = LocalContext.current,
     paddingValues: PaddingValues,
 ) {
     val diaries by diaryViewModel.diaries.observeAsState(emptyList())
     diaryViewModel.getDiaries()
-    //Log.i("info", diaries.isEmpty().toString())
+   // authViewModel.getUserInfo()
+    //    val userInfo by authViewModel.userInfo.observeAsState()
+
     //val diaryInOneDay by diaryViewModel.diaryInOneDay.observeAsState()
     val selections = remember {
         mutableStateListOf(
@@ -68,8 +82,9 @@ fun HomeScreen(
     val type = remember { mutableStateOf("day") }
 
     Column (
-        modifier = Modifier.padding(paddingValues)
-            .padding(horizontal = 30.dp)
+        modifier = Modifier
+            .padding(paddingValues)
+            .verticalScroll(rememberScrollState())
     ) {
         //Dashboard
         Column(
@@ -84,7 +99,7 @@ fun HomeScreen(
                     .padding(10.dp),
             ) {
                 Text(
-                    text = "HI Username",
+                    text = "HI ", // + userInfo?.lastName + " " + userInfo?.firstName
                     textAlign = TextAlign.Center,
                 )
             }
@@ -100,6 +115,7 @@ fun HomeScreen(
                         .padding(20.dp, 10.dp)
                 ) {
                     Column {
+
                         Text(
                             text = "Diary Streak",
                             modifier = Modifier.fillMaxWidth(),
@@ -132,44 +148,60 @@ fun HomeScreen(
             }
         }
         Spacer(modifier = Modifier.height(10.dp))
+        Button(
+            modifier = Modifier.width(100.dp),
+            onClick = {
+                navController.navigate(Screen.AllDiariesScreen.route) {
+                    launchSingleTop = true
+                }
+            },
+        ) {
+            Text(text = "All")
+        }
+        Spacer(modifier = Modifier.width(20.dp))
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
+                .padding(horizontal = 20.dp)
         ) {
             CalendarComponent(selections = selections, type = type)
             Spacer(modifier = Modifier.height(10.dp))
 
-//            if (type.value == "day") {
-//                Log.e("date", selections[0].date.toString())
-//                //CalendarDay(date=2024-05-06, position=MonthDate)
-//                diaryViewModel.getDiariesInOneDay(selections[0].date.toString())
-//                diaryViewModel.display("one")
-//            }
+            var displayDiaries by remember { mutableStateOf(emptyList<Diary>()) }
+            if (type.value == "day") {
+                Log.e("date", selections[0].date.toString())
+                //CalendarDay(date=2024-05-06, position=MonthDate)
+                displayDiaries = diaries.filter { diary ->
+                    getDate(diary.createdAt).toString() == selections[0].date.toString()
+                }
+            }
 
-            if (diaries.isNotEmpty()) {
+            if (displayDiaries.isNotEmpty()) {
                 LazyColumn(
                     modifier = Modifier
-                        .weight(1f)
+                        //.weight(1f)
                         .height(200.dp)
 
                 ) {
-                    items(diaries) { diary ->
+                    items(displayDiaries) { diary ->
                         SmallItemWidget(
                             tag = "diary",
                             title = diary.title,
                             previewContent = diary.content,
+                            timestamp = diary.createdAt,
                             Id = diary.id,
                             navController = navController,
                         )
                     }
                 }
             } else {
-                CenterTextField(text = "There's no widget this day... Let's make one!")
-                LazyRow() {
-                    item() {  }
-                }
+                CenterTextField(text = "There's no widget this day...")
+//                LazyRow() {
+//                    items(Mood.moodArray) { mood ->
+//                        MoodItem(mood)
+//                    }
+//                }
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -189,9 +221,9 @@ fun HomeScreen(
 }
 
 
-//
-//@Preview
-//@Composable
-//fun PreviewedHomeScreen() {
-//    HomeScreen()
-//}
+
+@Preview
+@Composable
+fun PreviewedHomeScreen() {
+    HomeScreen(DiaryViewModel(), AuthViewModel(), rememberNavController(), paddingValues = PaddingValues(20.dp))
+}

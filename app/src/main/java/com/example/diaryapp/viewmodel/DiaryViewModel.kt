@@ -19,6 +19,7 @@ class DiaryViewModel: ViewModel() {
     private val currentUser = firebaseAuth.currentUser
     private val userEmail = currentUser?.email
 
+
     private val diaryRepository: DiaryRepository
 
     //thay đổi thành StateFlow, LiveData lỗi thời r

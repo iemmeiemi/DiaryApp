@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.diaryapp.data.Diary
 import com.example.diaryapp.data.repositories.UserRepository
 import com.example.diaryapp.di.FireBaseInjection
 import com.google.firebase.auth.FirebaseAuth
@@ -17,11 +18,13 @@ class AuthViewModel : ViewModel() {
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val currentUser = firebaseAuth.currentUser
     private val userEmail = currentUser?.email
-    private val _userInfo = MutableLiveData<User>()
-    val userInfo: LiveData<User> get() = _userInfo
+    //private val user = currentUser?.metadata
 
-    private val _authResult = MutableLiveData<Result<Boolean>>()
-    val authResult: LiveData<Result<Boolean>> get() = _authResult
+    private val _userInfo = MutableLiveData<User?>()
+    val userInfo: LiveData<User?> get() = _userInfo
+
+    private val _authResult = MutableLiveData<Result<Boolean>?>()
+    val authResult: MutableLiveData<Result<Boolean>?> get() = _authResult
 
 
     init {
@@ -52,6 +55,18 @@ class AuthViewModel : ViewModel() {
                 _authResult.value = Result.Success(true)
             } else {
                 _authResult.value = Result.Success(false)
+            }
+        }
+    }
+
+    fun getUserInfo() {
+        viewModelScope.launch {
+            when (val result = userEmail?.let { userRepository.getUser(it) }) {
+                is Result.Success -> _userInfo.value = result.data as User
+                is Error -> {
+                    //Log.e("eror", )
+                }
+                else -> {}
             }
         }
     }

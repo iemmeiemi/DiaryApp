@@ -1,6 +1,7 @@
 package com.example.diaryapp.screen.components
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -107,3 +108,10 @@ fun CustomeSpacerLine (
     )
 }
 
+fun ToastMaker(context: Context, text: String) {
+    Toast.makeText(
+        context,
+        text,
+        Toast.LENGTH_SHORT
+    ).show()
+}

@@ -58,11 +58,9 @@ fun ProfileScreen(
                        imageVector = Icons.Default.Add,
                        contentDescription = "Premium"
                    ) {
-                       navController.navigate("premium")
+
                    }
                 }
-
-
 
             }
         }

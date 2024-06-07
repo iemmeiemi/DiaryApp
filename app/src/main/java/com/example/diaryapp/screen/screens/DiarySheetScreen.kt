@@ -1,8 +1,8 @@
 package com.example.diaryapp.screen.screens
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -30,14 +32,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.example.diaryapp.data.Diary
 import com.example.diaryapp.data.Result
+import com.example.diaryapp.screen.components.CustomSpacerBlock
+import com.example.diaryapp.screen.components.CustomeSpacerLine
+import com.example.diaryapp.screen.components.ImageModifiableBox
+import com.example.diaryapp.screen.components.ToastMaker
 import com.example.diaryapp.screen.navigation.Screen
 import com.example.diaryapp.utils.getDate
 import com.example.diaryapp.viewmodel.DiaryViewModel
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @Composable
 fun DiarySheetScreen(
@@ -54,14 +58,14 @@ fun DiarySheetScreen(
         modifier = Modifier
             .fillMaxWidth()
             .padding(paddingValues)
-            .padding(vertical = 30.dp)
+            .padding(horizontal = 30.dp)
     ){
         Column {
+            CustomSpacerBlock()
             Column (
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.Center
             ) {
-                Log.e("log", getDate(diary?.createdAt).toString() + " " + diary?.createdAt?.toDate().toString())
                 Text(
                     text =  getDate(diary?.createdAt).toString(),
                     modifier = Modifier
@@ -88,6 +92,20 @@ fun DiarySheetScreen(
                 ) {
                     Text(text = diary?.content ?: "Nothing Here...")
                 }
+            }
+
+            CustomSpacerBlock()
+            if(diary?.images?.isNullOrEmpty() == false) {
+                LazyRow(
+                    modifier = Modifier.height(200.dp)
+                ) {
+                    items(diary.images) { img ->
+                        Log.e("imagei", img.toString())
+                        AsyncImage(model = Uri.parse(img), contentDescription = null)
+                        CustomeSpacerLine()
+                    }
+                }
+                CustomSpacerBlock()
             }
 
             Row (

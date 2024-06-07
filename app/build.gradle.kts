@@ -65,12 +65,14 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling:1.6.5")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.activity:activity-compose:1.8.2")
+    implementation("com.google.accompanist:accompanist-themeadapter-material3:0.28.0")
 
     //firebase sependecy
     implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
-    //implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-storage")
 
     //compose navgation dependency
     implementation("androidx.navigation:navigation-compose:2.7.5")
@@ -80,5 +82,9 @@ dependencies {
     //Calendar
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
     implementation ("com.kizitonwose.calendar:compose:2.5.0")
+
+    //coil
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
 
 }

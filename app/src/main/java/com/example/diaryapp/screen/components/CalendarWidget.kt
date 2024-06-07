@@ -70,32 +70,32 @@ fun CalendarComponent(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ){
-            Button(
-                colors = ButtonColors(
-                    containerColor = if (type.value == "day") Color.DarkGray else Color.LightGray,
-                    contentColor = if (type.value == "day") Color.White else Color.Black,
-                    disabledContentColor = Black ,
-                    disabledContainerColor = Background,
-                ),
-                modifier = Modifier.width(100.dp),
-                onClick = { type.value = "day" },
-            ) {
-                Text(text = "Day")
-            }
-
-            Spacer(modifier = Modifier.width(20.dp))
-            Button(
-                colors = ButtonColors(
-                    containerColor = if (type.value == "month") Background2 else Background,
-                    contentColor = if (type.value == "month") Color.White else Color.Black,
-                    disabledContentColor = Black ,
-                    disabledContainerColor = Background,
-                ),
-                modifier = Modifier.width(100.dp),
-                onClick = { type.value = "month" },
-            ) {
-                Text(text = "Month")
-            }
+//            Button(
+//                colors = ButtonColors(
+//                    containerColor = if (type.value == "day") Color.DarkGray else Color.LightGray,
+//                    contentColor = if (type.value == "day") Color.White else Color.Black,
+//                    disabledContentColor = Black ,
+//                    disabledContainerColor = Background,
+//                ),
+//                modifier = Modifier.width(100.dp),
+//                onClick = { type.value = "day" },
+//            ) {
+//                Text(text = "Day")
+//            }
+//
+//            Spacer(modifier = Modifier.width(20.dp))
+//            Button(
+//                colors = ButtonColors(
+//                    containerColor = if (type.value == "month") Background2 else Background,
+//                    contentColor = if (type.value == "month") Color.White else Color.Black,
+//                    disabledContentColor = Black ,
+//                    disabledContainerColor = Background,
+//                ),
+//                modifier = Modifier.width(100.dp),
+//                onClick = { type.value = "month" },
+//            ) {
+//                Text(text = "Month")
+//            }
         }
         Spacer(modifier = Modifier.height(10.dp))
 

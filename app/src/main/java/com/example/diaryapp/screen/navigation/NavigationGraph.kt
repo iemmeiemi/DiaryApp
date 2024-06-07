@@ -18,6 +18,7 @@ import com.example.diaryapp.screen.screens.SignUpScreen
 import com.example.diaryapp.viewmodel.AuthViewModel
 import com.example.diaryapp.viewmodel.DiaryViewModel
 import com.example.diaryapp.data.Result
+import com.example.diaryapp.screen.screens.AllDiariesScreen
 import com.example.diaryapp.viewmodel.HomeViewModel
 
 
@@ -72,16 +73,28 @@ fun NavigationGraph(
                 context = context
             )
         }
+
         composable(Screen.HomeScreen.route) {
             Log.i("run", "home")
             HomeScreen(
                 diaryViewModel = diaryViewModel,
+                authViewModel = authViewModel,
                 navController = navController,
                 paddingValues = paddingValues
             )
         }
         composable(Screen.DiaryScreen.route) {
             DiaryScreen( diaryViewModel, navController, context, paddingValues )
+        }
+
+        composable(Screen.AllDiariesScreen.route) {
+            Log.i("run", "login")
+            AllDiariesScreen(
+                navController,
+                paddingValues,
+                context,
+                diaryViewModel
+            )
         }
 
         composable(Screen.ProfileScreen.route) {
