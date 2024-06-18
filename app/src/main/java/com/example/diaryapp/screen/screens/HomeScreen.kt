@@ -30,6 +30,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -44,6 +45,7 @@ import com.example.diaryapp.data.Diary
 import com.example.diaryapp.screen.components.CalendarComponent
 import com.example.diaryapp.screen.components.CenterTextField
 import com.example.diaryapp.screen.components.CustomButton2
+import com.example.diaryapp.screen.components.CustomeSpacerLine
 import com.example.diaryapp.screen.components.SmallItemWidget
 import com.example.diaryapp.screen.navigation.Screen
 import com.example.diaryapp.theme.Background
@@ -52,6 +54,8 @@ import com.example.diaryapp.theme.Black
 import com.example.diaryapp.utils.getDate
 import com.example.diaryapp.viewmodel.AuthViewModel
 import com.example.diaryapp.viewmodel.DiaryViewModel
+import com.example.diaryapp.viewmodel.LetterViewModel
+import com.google.firebase.Timestamp
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import java.time.LocalDate
@@ -60,24 +64,31 @@ import java.time.LocalDate
 fun HomeScreen(
     diaryViewModel: DiaryViewModel,
     authViewModel: AuthViewModel,
+    letterViewModel: LetterViewModel,
     navController: NavHostController,
     context: Context = LocalContext.current,
     paddingValues: PaddingValues,
 ) {
     val diaries by diaryViewModel.diaries.observeAsState(emptyList())
+    val letters by letterViewModel.letters.observeAsState(emptyList())
     diaryViewModel.getDiaries()
    // authViewModel.getUserInfo()
     //    val userInfo by authViewModel.userInfo.observeAsState()
 
+    val today = CalendarDay(
+        position = DayPosition.MonthDate,
+        date = LocalDate.now()
+    )
+    letterViewModel.getLettersInOneDay(Timestamp.now())
+
     //val diaryInOneDay by diaryViewModel.diaryInOneDay.observeAsState()
     val selections = remember {
         mutableStateListOf(
-            CalendarDay(
-                position = DayPosition.MonthDate,
-                date = LocalDate.now()
-            )
+            today
         )
     }
+
+
 
     val type = remember { mutableStateOf("day") }
 
@@ -148,16 +159,25 @@ fun HomeScreen(
             }
         }
         Spacer(modifier = Modifier.height(10.dp))
-        Button(
-            modifier = Modifier.width(100.dp),
-            onClick = {
-                navController.navigate(Screen.AllDiariesScreen.route) {
-                    launchSingleTop = true
-                }
-            },
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            Arrangement.Center
         ) {
-            Text(text = "All")
+            Button(
+                modifier = Modifier.width(100.dp)
+                    .background(color = Background),
+                onClick = {
+                    navController.navigate(Screen.AllDiariesScreen.route) {
+                        launchSingleTop = true
+                    }
+                },
+            ) {
+                Text(text = "All")
+            }
         }
+
+
         Spacer(modifier = Modifier.width(20.dp))
 
         Column(
@@ -194,6 +214,18 @@ fun HomeScreen(
                             navController = navController,
                         )
                     }
+                    if (selections[0] == today) {
+                        items(letters) { letter ->
+                            SmallItemWidget(
+                                tag = "letter",
+                                title = letter.title,
+                                previewContent = letter.content,
+                                timestamp = letter.createdAt,
+                                Id = letter.id,
+                                navController = navController,
+                            )
+                        }
+                    }
                 }
             } else {
                 CenterTextField(text = "There's no widget this day...")
@@ -210,8 +242,14 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth(),
                 Arrangement.Center
             ) {
-                CustomButton2(modifier = Modifier.width(120.dp), "Diary") {
-                    navController.navigate(Screen.DiaryScreen.route)
+                if (selections[0] == today) {
+                    CustomButton2(modifier = Modifier.width(120.dp), "Diary") {
+                        navController.navigate(Screen.DiaryScreen.route)
+                    }
+                }
+                CustomeSpacerLine()
+                CustomButton2(modifier = Modifier.width(120.dp), "Letter") {
+                    navController.navigate(Screen.LetterScreen.route)
                 }
                 Spacer(modifier = Modifier.width(20.dp))
 
@@ -225,5 +263,5 @@ fun HomeScreen(
 @Preview
 @Composable
 fun PreviewedHomeScreen() {
-    HomeScreen(DiaryViewModel(), AuthViewModel(), rememberNavController(), paddingValues = PaddingValues(20.dp))
+    HomeScreen(DiaryViewModel(), AuthViewModel(), LetterViewModel(), rememberNavController(), paddingValues = PaddingValues(20.dp))
 }

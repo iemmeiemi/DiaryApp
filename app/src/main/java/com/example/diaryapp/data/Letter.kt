@@ -7,11 +7,16 @@ data class Letter(
     val id: String,
     val title: String,
     val content: String,
-    val isDeleted: Boolean,
+    var images: List<String?>,
+    var isDeleted: Boolean = false,
+    var sendedAt: Timestamp? = null,
+    var createdDate: String? = null,
 
     @ServerTimestamp
     var createdAt: Timestamp? = null,
-    var sendedAt: Timestamp? = null
+
 ) {
+
+    constructor() : this("", "", "", emptyList(),false, null, null)
 
 }

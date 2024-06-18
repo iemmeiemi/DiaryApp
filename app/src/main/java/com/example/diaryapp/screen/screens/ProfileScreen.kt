@@ -23,6 +23,7 @@ import com.example.diaryapp.screen.components.CustomButton
 import com.example.diaryapp.screen.components.CustomSpacerBlock
 import com.example.diaryapp.screen.components.CustomeSpacerLine
 import com.example.diaryapp.screen.components.NormalTextField
+import com.example.diaryapp.screen.navigation.Screen
 import com.example.diaryapp.theme.Background2
 import com.example.diaryapp.viewmodel.AuthViewModel
 
@@ -32,13 +33,18 @@ fun ProfileScreen(
     paddingValues: PaddingValues,
     authViewModel: AuthViewModel
 ) {
-    Column {
+    Column(
+        modifier = Modifier
+            .background(color = Background2)
+            .fillMaxWidth()
+            .padding(paddingValues)
+            .padding(horizontal = 30.dp)
+    ) {
         Column(
             modifier = Modifier
                 .background(color = Background2)
                 .fillMaxWidth()
-                .padding(paddingValues)
-                .padding(horizontal = 30.dp)
+                .padding(20.dp)
         ) {
             Row {
                 Image(
@@ -58,7 +64,7 @@ fun ProfileScreen(
                        imageVector = Icons.Default.Add,
                        contentDescription = "Premium"
                    ) {
-
+                        navController.navigate(Screen.PremiumScreen.route)
                    }
                 }
 

@@ -1,5 +1,6 @@
 package com.example.diaryapp.screen.screens
 
+import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
@@ -44,13 +45,14 @@ import com.example.diaryapp.viewmodel.HomeViewModel
 //    val router: Router = remember { RouterImpl(navController, route) }
 //    val isFullScreen = Screen.isFullScreen(route)
 @Composable
-fun MainLayout( context: Context) {
+fun MainLayout( context: Context, activity: Activity) {
 
     val navController = rememberNavController()
 
     //tác vụ tốn nhiều thời gian
     var currentFrame =  navController.currentBackStackEntryAsState().value?.destination?.route.toString()
-    val applyLayout = (currentFrame !== Screen.SignupScreen.route && currentFrame !== Screen.LoginScreen.route)
+    val applyLayout = (currentFrame == Screen.HomeScreen.route || currentFrame == Screen.ProfileScreen.route
+            ||  currentFrame == Screen.NotificationScreen.route || currentFrame == Screen.SettingScreen.route)
     Log.e("route", currentFrame )
 
     Scaffold(
@@ -71,6 +73,6 @@ fun MainLayout( context: Context) {
         },
 
     ) {
-        NavigationGraph(navController = navController, it, context)//
+        NavigationGraph(navController = navController, it, context, activity)//
     }
 }

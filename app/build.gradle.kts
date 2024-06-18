@@ -54,6 +54,10 @@ dependencies {
     implementation("androidx.activity:activity:1.8.2")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+
+    //Zalo Pay SDK
+    implementation(files("D:\\Study\\VKU\\2thCode\\Mobile\\ExternalLib\\ZaloAppToApp\\zpdk-release-v3.1.aar"))
+
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -68,7 +72,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-themeadapter-material3:0.28.0")
 
     //firebase sependecy
-    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
@@ -86,5 +90,16 @@ dependencies {
     //coil
     implementation("io.coil-kt:coil-compose:2.6.0")
 
+    //.env
+    implementation("io.github.cdimascio:dotenv-kotlin:6.2.2")
 
+    //Http
+    //implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.6.0")
+
+    // Retrofit with Scalar Converter
+    implementation ("com.squareup.retrofit2:converter-scalars:2.9.0")
+
+    //encrypt
+    implementation("commons-codec:commons-codec:1.14")
 }

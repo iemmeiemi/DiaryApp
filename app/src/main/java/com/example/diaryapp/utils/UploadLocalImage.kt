@@ -28,7 +28,7 @@ import java.io.File
 
 @Composable
 fun UploadLocalImageLauncher(imageUri: MutableState<Uri>) {
-    val storage = Firebase.storage("gs://widgettesting-5fe98.appspot.com")
+    val storage = Firebase.storage("gs://diaryapp-29d40.appspot.com")
     val storageRef = storage.reference
     var uriList: List<Uri?> by remember { mutableStateOf(emptyList<Uri?>()) }
     var storageUriList: List<Uri> by remember { mutableStateOf(emptyList()) }

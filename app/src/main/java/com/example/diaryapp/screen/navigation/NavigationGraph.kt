@@ -1,25 +1,34 @@
 package com.example.diaryapp.screen.navigation
 
+import android.app.Activity
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.activity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.diaryapp.data.Result
+import com.example.diaryapp.screen.screens.AllDiariesScreen
+import com.example.diaryapp.screen.screens.ArticlesScreen
+import com.example.diaryapp.screen.screens.BillScreen
 import com.example.diaryapp.screen.screens.DiaryScreen
 import com.example.diaryapp.screen.screens.DiarySheetScreen
 import com.example.diaryapp.screen.screens.HomeScreen
+import com.example.diaryapp.screen.screens.LetterScreen
 import com.example.diaryapp.screen.screens.LoginScreen
 import com.example.diaryapp.screen.screens.NotificationScreen
+import com.example.diaryapp.screen.screens.PremiumScreen
 import com.example.diaryapp.screen.screens.ProfileScreen
 import com.example.diaryapp.screen.screens.SignUpScreen
+import com.example.diaryapp.viewmodel.ArticlesViewModel
 import com.example.diaryapp.viewmodel.AuthViewModel
 import com.example.diaryapp.viewmodel.DiaryViewModel
-import com.example.diaryapp.data.Result
-import com.example.diaryapp.screen.screens.AllDiariesScreen
 import com.example.diaryapp.viewmodel.HomeViewModel
+import com.example.diaryapp.viewmodel.LetterViewModel
+import com.example.diaryapp.viewmodel.ZaloPayViewModel
 
 
 @Composable
@@ -27,9 +36,11 @@ fun NavigationGraph(
     navController: NavHostController,
     paddingValues: PaddingValues,
     context: Context,
+    activity: Activity,
     authViewModel: AuthViewModel = viewModel(),
-    homeViewModel: HomeViewModel = viewModel(),
     diaryViewModel: DiaryViewModel = viewModel(),
+    letterViewModel: LetterViewModel = viewModel(),
+    zaloPayViewModel: ZaloPayViewModel = viewModel(),
 
 ) {
     authViewModel.autoLogin()
@@ -79,13 +90,12 @@ fun NavigationGraph(
             HomeScreen(
                 diaryViewModel = diaryViewModel,
                 authViewModel = authViewModel,
+                letterViewModel = letterViewModel,
                 navController = navController,
                 paddingValues = paddingValues
             )
         }
-        composable(Screen.DiaryScreen.route) {
-            DiaryScreen( diaryViewModel, navController, context, paddingValues )
-        }
+
 
         composable(Screen.AllDiariesScreen.route) {
             Log.i("run", "login")
@@ -101,8 +111,28 @@ fun NavigationGraph(
             ProfileScreen(navController, paddingValues, authViewModel)
         }
 
+        composable("${Screen.BillScreen.route}/{packageId}") {
+            val packageId = it.arguments?.getString("packageId")
+            if (packageId != null) {
+                BillScreen(packageId, context = context, activity = activity, navController = navController, zaloPayViewModel = zaloPayViewModel)
+            }
+        }
+
+        composable(Screen.PremiumScreen.route) {
+            PremiumScreen(navController = navController, context = context, zaloPayViewModel)
+        }
+
+        composable(Screen.LetterScreen.route) {
+            LetterScreen(letterViewModel = letterViewModel, navController = navController, context = context, )
+        }
+
         composable(Screen.NotificationScreen.route) {
-            NotificationScreen( paddingValues = paddingValues, navController = navController )
+            //NotificationScreen( paddingValues = paddingValues, navController = navController )
+            ArticlesScreen( navController = navController, paddingValues = paddingValues, context = context, articleViewModel = ArticlesViewModel(), )
+        }
+
+        composable(Screen.DiaryScreen.route) {
+            DiaryScreen( diaryViewModel, navController, context, paddingValues )
         }
 
         composable("${Screen.DiaryScreen.route}/{diaryId}") {

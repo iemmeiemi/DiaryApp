@@ -12,12 +12,12 @@ class firebaseStorage {
     val storageRef = storage.reference
 
 
-    suspend fun saveAndGetLink(uris: List<String?>, userEmail:String): List<String?> {
+    suspend fun saveAndGetLink(uris: List<String?>, userEmail:String, path:String): List<String?> {
         var storageUriList: List<String?> = emptyList()
         try {
             for (uri in uris) {
                 var file = Uri.fromFile(File(uri.toString()))
-                val imgRef = storageRef.child("images/${userEmail}/${file.lastPathSegment}")
+                val imgRef = storageRef.child("${path}/${userEmail}/${file.lastPathSegment}")
                 var uploadTask = uri?.let { imgRef.putFile(Uri.parse(uri)) }
 
                 // Register observers to listen for when the download is done or if it fails

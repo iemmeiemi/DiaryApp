@@ -78,7 +78,7 @@ fun DiaryScreen(
     var diaryContent by remember { mutableStateOf(dc) }
 
     var uriList = remember { mutableStateListOf<Uri?>() }
-    var storageUriList: List<Uri> by remember { mutableStateOf(emptyList()) }
+    //var storageUriList: List<Uri> by remember { mutableStateOf(emptyList()) }
     //var imageUri: Uri? by remember { mutableStateOf(null) }
 
     val launcher = rememberLauncherForActivityResult(

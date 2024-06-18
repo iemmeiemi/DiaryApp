@@ -1,39 +1,32 @@
 package com.example.diaryapp
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
+import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation.compose.rememberNavController
-import com.example.diaryapp.screen.navigation.NavigationGraph
+import com.example.diaryapp.constants.AppInfo
 import com.example.diaryapp.screen.screens.MainLayout
+import com.google.firebase.FirebaseApp
+import vn.zalopay.sdk.Environment
+import vn.zalopay.sdk.ZaloPaySDK
 
 class MainActivity : ComponentActivity() {
     private var backPressed = 0L
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //FirebaseApp.initializeApp(this)
         setContent {
             Log.i("run", "mainlayout")
-            MainLayout( context = this)
+            MainLayout( context = this, this@MainActivity)
         }
+        val policy = ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
+
+        ZaloPaySDK.init(AppInfo.APP_ID, Environment.SANDBOX);
     }
 
 
@@ -48,6 +41,11 @@ class MainActivity : ComponentActivity() {
             ).show()
         }
         backPressed = System.currentTimeMillis()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        ZaloPaySDK.getInstance().onResult(intent)
     }
 }
 

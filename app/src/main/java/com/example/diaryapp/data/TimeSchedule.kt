@@ -6,11 +6,21 @@ sealed class TimeSchedule (
     val title: String,
     val rangeOfMonth: Int,
     val rangeOfYear: Int,
+    val rangeOfDay: Int
 ) {
-    object OneMonth: TimeSchedule("1 month", 1, 0 )
-    object SixMonths: TimeSchedule("6 months", 6, 0 )
-    object OneYear: TimeSchedule("1 years", 0, 1 )
-
+    object OneDay: TimeSchedule("1 day", 0, 0, 1 )
+    object MinusOneDay: TimeSchedule("1 day", 0, 0, -1 )
+    object OneMonth: TimeSchedule("1 month", 1, 0, 1)
+    object SixMonths: TimeSchedule("6 months", 6, 0, 1)
+    object OneYear: TimeSchedule("1 years", 0, 1, 1)
+    companion object {
+        var timeScheduleList: List<TimeSchedule> = listOf(
+            TimeSchedule.OneMonth,
+            TimeSchedule.OneYear,
+            TimeSchedule.OneDay,
+            TimeSchedule.SixMonths,
+        )
+    }
 }
 
 /* XỬ LÝ TÁC VỤ NGÀY THÁNG

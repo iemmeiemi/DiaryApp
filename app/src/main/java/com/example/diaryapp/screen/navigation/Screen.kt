@@ -33,13 +33,16 @@ sealed class Screen(
     val title: String = "",
     @DrawableRes val icon: Int = 0
 ) {
+
     object LoginScreen:Screen("loginscreen")
     object SignupScreen:Screen("signupscreen")
     object HomeScreen:Screen("homescreen")
     object DiaryScreen:Screen("diaryscreen")
     object DiarySheetScreen:Screen("diarysheetscreen")
     object AllDiariesScreen:Screen("alldiariesscreen")
+    object LetterScreen:Screen("letterscreen")
     object PremiumScreen:Screen("premiumscreen")
+    object BillScreen:Screen("billscreen")
     object SplashScreen:Screen("splashscreen")
     object NotificationScreen:Screen("notificationscreen")
     object SettingScreen:Screen("settingscreen")

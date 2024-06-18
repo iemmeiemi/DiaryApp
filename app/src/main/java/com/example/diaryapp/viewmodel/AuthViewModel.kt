@@ -11,11 +11,13 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import com.example.diaryapp.data.Result
 import com.example.diaryapp.data.User
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 class AuthViewModel : ViewModel() {
     private val userRepository: UserRepository
 
-    private val firebaseAuth = FirebaseAuth.getInstance()
+    private val firebaseAuth = Firebase.auth
     private val currentUser = firebaseAuth.currentUser
     private val userEmail = currentUser?.email
     //private val user = currentUser?.metadata

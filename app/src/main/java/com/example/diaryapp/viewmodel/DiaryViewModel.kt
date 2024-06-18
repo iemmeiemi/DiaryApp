@@ -9,13 +9,14 @@ import com.example.diaryapp.data.Diary
 import com.example.diaryapp.data.Result
 import com.example.diaryapp.data.repositories.DiaryRepository
 import com.example.diaryapp.di.FireBaseInjection
+import com.example.diaryapp.di.FireBaseInjection.authInstance
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 
 class DiaryViewModel: ViewModel() {
 
-    private val firebaseAuth = FirebaseAuth.getInstance()
+    private val firebaseAuth = authInstance()
     private val currentUser = firebaseAuth.currentUser
     private val userEmail = currentUser?.email
 
@@ -60,7 +61,9 @@ class DiaryViewModel: ViewModel() {
     fun getDiaries() {
         viewModelScope.launch {
             when (val result = diaryRepository.getAllDiary(userEmail.toString())) {
-                is Result.Success -> _diaries.value = result.data as List<Diary>
+                is Result.Success -> {
+                    _diaries.value = result.data as List<Diary>
+                }
                 is Error -> {
                     //Log.e("eror", )
                 }

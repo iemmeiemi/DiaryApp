@@ -24,7 +24,7 @@ class DiaryRepository(
         try {
             if (diary.images.isNotEmpty()) {
                 Log.e("hahahahahah", diary.images.isNotEmpty().toString())
-                diary.images = firebaseStorage().saveAndGetLink(diary.images, userEmail)
+                diary.images = firebaseStorage().saveAndGetLink(diary.images, userEmail, "images")
                 Log.e("hahahahahah", diary.images.isNotEmpty().toString())
             }
             saveDiaryToFirestore(userEmail, diary)
