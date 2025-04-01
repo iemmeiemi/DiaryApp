@@ -1,5 +1,5 @@
-# DiaryApp
-DACS3: Android Application built in Kotlin, implented MVVM architechture, Jetpack Compose, ZaloPay intergrated, Firebase FireaStore, FireBase Storage, FireBase Authentication
+# DiaryApp (incomplete)
+DACS3: Practice Kotlin Programming - Android Application built in Kotlin, implemented MVVM architechture, Jetpack Compose, ZaloPay integrated, Firebase FireaStore, FireBase Storage, FireBase Authentication
 Home page:
 ![image](https://github.com/iemmeiemi/DiaryApp/assets/120089568/19177ac2-2d3a-435e-86c6-1f444cfe000a)
 Create Letter Page:
